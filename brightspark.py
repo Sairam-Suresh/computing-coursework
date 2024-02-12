@@ -1,4 +1,4 @@
-# This script was created in full by Lohith Ishan from S408
+# This script was created in full by Lohith Ishan from S401
 # Imports
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
@@ -60,10 +60,10 @@ def brightsparks():
         # Variables
         save = drive.current_url
         possible_hrefs = ['//a[@href="scholarship.php"]', '//a[@href="scholarships.php"]', '//a[@href="scholar.php"]',
-             '//a[@href="mpa-scholarship-programme.php"]', '//a[@href="ss-scholarship.php"]', '//a[@href="uni.php"]',
-             '//a[@href="midterm.php?schid=10441"]', '//area[@href="scholarship.php"]','//a[@href="phd.php"]',
-             '//a[@href="scholarships_bcaundergrad.php"]', '//a[@href="csit-undergraduate-scholarship.php"]',
-             '//a[@href="our-scholarships.php"]',"scholarship-available.php", '//a[@href="#"]']
+                          '//a[@href="mpa-scholarship-programme.php"]', '//a[@href="ss-scholarship.php"]', '//a[@href="uni.php"]',
+                          '//a[@href="midterm.php?schid=10441"]', '//area[@href="scholarship.php"]','//a[@href="phd.php"]',
+                          '//a[@href="scholarships_bcaundergrad.php"]', '//a[@href="csit-undergraduate-scholarship.php"]',
+                          '//a[@href="our-scholarships.php"]',"scholarship-available.php", '//a[@href="#"]']
 
 
         print(save)
@@ -118,7 +118,7 @@ def brightsparks():
                     drive.find_element(By.XPATH, i).click()
                     break
                 except:
-                    if i == p[-1]:
+                    if i == possible_hrefs[-1]:
                         print("It is Here")
                         if "nuhs" in save:
                             drive.find_element(By.XPATH, '//a[@href="index.php"]').click()
