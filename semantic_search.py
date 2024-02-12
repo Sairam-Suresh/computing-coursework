@@ -73,12 +73,8 @@ def scrape_website():
     text_tokenized = []
 
     # TODO: Wait for a fix for BrightSparks scraper
-    # brightspark_scholarships = brightsparks()
-    # for e in range(len(brightspark_scholarships)):
-    #     try:
-    #         text_tokenized.append([brightspark_scholarships[e][0], pre_processing(brightspark_scholarships[e][1])])
-    #     except:
-    #         pass
+    def lohith_scraper_function():
+        return brightsparks()
 
     def ayaan_scraper_function():
         return mindef_scholarship()
@@ -87,7 +83,11 @@ def scrape_website():
         return scrape()
 
     with concurrent.futures.ThreadPoolExecutor() as executor:
-        scrapers = [executor.submit(ayaan_scraper_function), executor.submit(sairam_scraper_function)]
+        scrapers = [
+            executor.submit(ayaan_scraper_function),
+            executor.submit(sairam_scraper_function),
+            # executor.submit(lohith_scraper_function),
+        ]
         for data in concurrent.futures.as_completed(scrapers):
             for e in range(len(data.result())):
                 try:
