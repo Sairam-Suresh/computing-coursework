@@ -7,9 +7,10 @@ import pandas as pd
 import numpy as np
 import spacy
 import string
-import streamlit as st
-from time import *
 from spacy.lang.en.stop_words import STOP_WORDS
+import concurrent.futures
+
+from brightspark import brightsparks
 from mindef_scholarships import *
 from gensim.models import TfidfModel  # We could use other models but this is better for tasks such as document
 # retrieval based on keyword matching.
@@ -21,8 +22,10 @@ from scholarshipportal_web_scraper import *
 # We use pickle instead of json, as pickle is better for python
 scholarships_cache = "scholarships_cache.pkl"
 
-def pre_processing(text):
+global dictionary
+global scholarships_results_text
 
+def pre_processing(text):
     spacy_nlp = spacy.load("en_core_web_sm")
 
     # Words to remove
@@ -63,20 +66,34 @@ def create_model(body_text):
     return important_words_model
 
 
+# This function was modified and appended by Sairam from S401
+# Added by Sairam: Parallel scraping of websites using concurrent.futures.ThreadPoolExecutor
 def scrape_website():
     # This function gathers all the scraped data from the websites
     text_tokenized = []
 
-    text = mindef_scholarship()
-    for i in range(len(text)):
-        text_tokenized.append([text[i][0], pre_processing(text[i][1])])
+    # TODO: Wait for a fix for BrightSparks scraper
+    # brightspark_scholarships = brightsparks()
+    # for e in range(len(brightspark_scholarships)):
+    #     try:
+    #         text_tokenized.append([brightspark_scholarships[e][0], pre_processing(brightspark_scholarships[e][1])])
+    #     except:
+    #         pass
 
-    international_scholarships = scrape()
-    for e in range(len(international_scholarships)):
-        try:
-            text_tokenized.append([international_scholarships[e][0], pre_processing(international_scholarships[e][1])])
-        except:
-            pass
+    def ayaan_scraper_function():
+        return mindef_scholarship()
+
+    def sairam_scraper_function():
+        return scrape()
+
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        scrapers = [executor.submit(ayaan_scraper_function), executor.submit(sairam_scraper_function)]
+        for data in concurrent.futures.as_completed(scrapers):
+            for e in range(len(data.result())):
+                try:
+                    text_tokenized.append([data.result()[e][0], pre_processing(data.result()[e][1])])
+                except:
+                    pass
 
     # Casts the tokenized array of words in each scholarship, into a Pandas dataframe as this makes it easier to
     # create a tfidf model
