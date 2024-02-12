@@ -25,4 +25,4 @@ if internet_disclaimer:
             st.write("Unfortunately we were not able to find any scholarships that satisfy your needs")
         else:
             st.markdown("### Here are the top 10 scholarships in descending order")
-            st.write(scholarships_output) 
+            st.write(scholarships_output)

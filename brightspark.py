@@ -31,7 +31,6 @@ def brightsparks():
     Select(driver.find_element(By.ID, "eligibility")).select_by_value("4")
     driver.find_element(By.CLASS_NAME, "btn-ss").click()
 
-
     # Keeps clicking the show-more button to show all the scholarships
     while True:
         try:
