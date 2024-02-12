@@ -1,6 +1,7 @@
 # Done By: Ayaan
 
 from semantic_search import *
+import streamlit as st
 
 # Requires the user to acknowledge that the disclaimer
 internet_disclaimer = st.checkbox("Acknowledge that using this programme requires you to have an internet connection")
