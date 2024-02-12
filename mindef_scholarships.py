@@ -1,11 +1,9 @@
-#Done By: Ayaan
-
-from selenium.webdriver.common.by import By
+# Done By: Ayaan
 from bs4 import BeautifulSoup
 import requests
 
 
-def mindefScholarship():
+def mindef_scholarship():
     link = "https://www.mindef.gov.sg/oms/scholarship/"
     website = requests.get(link)
 
@@ -17,12 +15,11 @@ def mindefScholarship():
     scholarship_results = []
 
     for result in results:
-        #print(result)
+        # print(result)
         result = str(result)
         start = result.find("scholarships")
         end = result.find(" id=")
         scholarship_links.append(result[start:end-1])
-
 
     for scholarship in scholarship_links:
         scholarship_link = "https://www.mindef.gov.sg/oms/scholarship/"+scholarship
@@ -30,10 +27,13 @@ def mindefScholarship():
         
         soup_scholarship = BeautifulSoup(website_scholarship.content, "html.parser")
 
-
         scholarship_body = soup_scholarship.get_text()
 
-        #scholarship_results.append([scholarship_link, scholarship_body[eligibility_criteria_index:value_award_index].replace("\n", ""), scholarship_body[value_award_index:courses_index].replace("\n", ""), scholarship_body[courses_index:goal_universities_index].replace("\n", ""), scholarship_body[goal_universities_index:ending_index].replace("\n", "")])
+        # scholarship_results.append([scholarship_link, scholarship_body[
+        # eligibility_criteria_index:value_award_index].replace("\n", ""), scholarship_body[
+        # value_award_index:courses_index].replace("\n", ""), scholarship_body[
+        # courses_index:goal_universities_index].replace("\n", ""), scholarship_body[
+        # goal_universities_index:ending_index].replace("\n", "")])
         scholarship_results.append([scholarship_link, scholarship_body.replace("\n", "")])
 
 

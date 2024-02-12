@@ -3,7 +3,8 @@
 # Imports
 import itertools
 import multiprocessing
-import pprint
+import pickle
+from pprint import pprint
 from concurrent.futures import ProcessPoolExecutor
 from bs4 import BeautifulSoup
 from selenium import webdriver
@@ -11,10 +12,6 @@ from selenium.webdriver.chrome.options import Options
 from time import sleep, time
 import re
 from threading import Timer
-
-# Constants
-# The maximum number of worker processes that can be spawned
-process_pool_number = 5
 
 
 # Function to scrape necessary data from the detail view of the scholarship
@@ -29,6 +26,7 @@ def scrape_scholarship_details(url, selenium_lock: multiprocessing.Lock):
         "--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
         "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.130 Safari/537.36"
     )
+    opts.add_argument("--disable-gpu")
     web_driver = webdriver.Chrome(options=opts)
     web_driver.delete_all_cookies()
 
@@ -51,8 +49,7 @@ def scrape_scholarship_details(url, selenium_lock: multiprocessing.Lock):
         # case we try scraping too fast
         Timer(sleep_time + (1.5 if (details == '') else 0), selenium_lock.release).start()
 
-        # TODO: REMOVE THIS AFTER DEBUGGING IS COMPLETED
-        print(f"Scraped {url}: {'Failed' if (details == '') else 'Success'}")
+        print("Scraped: " + url)
 
         # Return the result
         return [url, details]
@@ -81,6 +78,7 @@ def scrape_scholarship_urls(driver):
     all_scholarship_links = []
     while True:
         driver.delete_all_cookies()
+        driver.set_page_load_timeout(60)
         driver.get(f"https://www.scholarshipportal.com/scholarships/singapore?page={page_index}")
         sleep(7)
 
@@ -115,13 +113,18 @@ def scrape_all_scholarships_details(scholarship_links: list):
 
     # This part uses a Process pool to scrape all the scholarships in parallel, reducing
     # The time taken to scrape the websites
-    with ProcessPoolExecutor(max_workers=process_pool_number) as executor:
-        for i in executor.map(scrape_scholarship_details, scholarship_links, itertools.repeat(lock)):
-            scholarships.append(i)
+    try:
+        with ProcessPoolExecutor(max_workers=5) as executor:
+            for i in executor.map(scrape_scholarship_details, scholarship_links, itertools.repeat(lock)):
+                scholarships.append(i)
+    except pickle.PicklingError:
+        # This means that something somehow went wrong, but since it does not destroy any data we just continue
+        print("Scraper has stopped scraping due to an error. Continuing with preexisting data.")
+        pass
 
     # Filter out all the scholarships that could not be scraped
     filtered_scholarships = list(filter((lambda x: x is not None and x[1] != ""), scholarships))
-
+    pprint(filtered_scholarships)
     return filtered_scholarships
 
 
@@ -137,6 +140,7 @@ def scrape():
         "--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
         "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.130 Safari/537.36"
     )
+    options.add_argument("--disable-gpu")
     driver = webdriver.Chrome(options=options)
     driver.delete_all_cookies()
 
@@ -166,4 +170,4 @@ def scrape():
 
 # If we are running this as main, automatically assume that we are attempting to debug this script
 if __name__ == "__main__":
-    pprint.pprint(scrape())
+    pprint(scrape())
