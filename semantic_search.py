@@ -72,6 +72,7 @@ def scrape_website():
     # This function gathers all the scraped data from the websites
     text_tokenized = []
 
+    # The following functions are used to submit work to the ThreadPoolExecutor
     # TODO: Wait for a fix for BrightSparks scraper
     def lohith_scraper_function():
         return brightsparks()
@@ -82,6 +83,8 @@ def scrape_website():
     def sairam_scraper_function():
         return scrape()
 
+    # Execute all 3 scrapers in parallel using ThreadPoolExecutor
+    # and append the results to the text_tokenized list
     with concurrent.futures.ThreadPoolExecutor() as executor:
         scrapers = [
             executor.submit(ayaan_scraper_function),
