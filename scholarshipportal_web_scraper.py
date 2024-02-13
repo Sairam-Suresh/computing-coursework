@@ -49,15 +49,15 @@ def scrape_scholarship_details(url, selenium_lock: multiprocessing.Lock):
         # case we try scraping too fast
         Timer(sleep_time + (1.5 if (details == '') else 0), selenium_lock.release).start()
 
-        print("Scraped: " + url)
+        # print("Scraped: " + url)
 
         # Return the result
         return [url, details]
     except Exception as e:
         # For some reason some pages fail to load, so we just ignore them since it would not affect the overall result
         # too much
-        print(f"Non-severe warning: Error parsing data from {url}: {e}."
-              f" Continuing anyway.")
+        # print(f"Non-severe warning: Error parsing data from {url}: {e}."
+        #       f" Continuing anyway.")
         try:
             # Dispose all resources after exception
             web_driver.close()
@@ -119,12 +119,11 @@ def scrape_all_scholarships_details(scholarship_links: list):
                 scholarships.append(i)
     except pickle.PicklingError:
         # This means that something somehow went wrong, but since it does not destroy any data we just continue
-        print("Scraper has stopped scraping due to an error. Continuing with preexisting data.")
+        # print("Scraper has stopped scraping due to an error. Continuing with preexisting data.")
         pass
 
     # Filter out all the scholarships that could not be scraped
     filtered_scholarships = list(filter((lambda x: x is not None and x[1] != ""), scholarships))
-    pprint(filtered_scholarships)
     return filtered_scholarships
 
 

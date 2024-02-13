@@ -23,24 +23,15 @@ global scholarships_results_text
 
 
 def lohith_scraper_function():
-    print("Lohith Started")
-    data = brightsparks()
-    print("Lohith Ended")
-    return data
+    return brightsparks()
 
 
 def ayaan_scraper_function():
-    print("Ayaan Started")
-    data = mindef_scholarship()
-    print("Ayaan Ended")
-    return data
+    return mindef_scholarship()
 
 
 def sairam_scraper_function():
-    print("Sairam Started")
-    data = scrape()
-    print("Sairam Ended")
-    return data
+    return scrape()
 
 
 def pre_processing(text):
@@ -84,16 +75,14 @@ def create_model(body_text):
     return important_words_model
 
 
-# This function was modified and appended by Sairam from S401
-# Added by Sairam: Parallel scraping of websites using concurrent.futures.ThreadPoolExecutor
+# Added by Sairam from S401: Added Parallel execution of the 3 scrapers
+# using concurrent.futures.ThreadPoolExecutor
 def scrape_website():
     # This function gathers all the scraped data from the websites
     text_tokenized = []
 
     # The following functions are used to submit work to the ThreadPoolExecutor
-    # TODO: Wait for a fix for BrightSparks scraper
-
-    # Execute all 3 scrapers in parallel using ThreadPoolExecutor
+    # Execute all 3 scrapers in parallel using ProcessPoolExecutor
     # and append the results to the text_tokenized list
     with concurrent.futures.ProcessPoolExecutor() as executor:
         scrapers = [

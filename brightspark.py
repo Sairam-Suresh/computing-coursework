@@ -1,4 +1,4 @@
-# This script was created in full by Lohith Ishan from S401
+# This script was created in full by Lohith Ishan from S408
 # Imports
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
