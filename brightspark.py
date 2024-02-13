@@ -12,11 +12,11 @@ import re
 import time
 
 def brightsparks():
-    #website being used to search scholarships
+    # website being used to search scholarships
     url = 'https://brightsparks.com.sg/searchScholarships.php'
     start = time.time()
 
-    #Opening Website
+    # Opening Website
     options = webdriver.ChromeOptions()
     options.add_argument('--headless')
     options.add_argument('--disable-gpu')
@@ -24,7 +24,7 @@ def brightsparks():
         ChromeDriverManager().install()), options=options)
     driver.get(url)
 
-    #Exit the ad if it appears
+    # Exit the ad if it appears
     driver.find_element(By.CLASS_NAME, "close").click()
 
     # Select dropdown to choose scholarships based on university students
