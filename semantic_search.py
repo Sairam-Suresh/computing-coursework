@@ -1,6 +1,6 @@
-#Done By: Ayaan (408)
+# Done By: Ayaan (408)
 
-#import packages
+# import packages
 import pickle
 import os
 import pandas as pd
@@ -25,6 +25,28 @@ scholarships_cache = "scholarships_cache.pkl"
 global dictionary
 global scholarships_results_text
 
+
+def lohith_scraper_function():
+    print("Lohith Started")
+    data = brightsparks()
+    print("Lohith Ended")
+    return data
+
+
+def ayaan_scraper_function():
+    print("Ayaan Started")
+    data = mindef_scholarship()
+    print("Ayaan Ended")
+    return data
+
+
+def sairam_scraper_function():
+    print("Sairam Started")
+    data = scrape()
+    print("Sairam Ended")
+    return data
+
+
 def pre_processing(text):
     spacy_nlp = spacy.load("en_core_web_sm")
 
@@ -33,7 +55,7 @@ def pre_processing(text):
     stop_words = spacy.lang.en.stop_words.STOP_WORDS
 
     # Tokenize the individual words as a form of data pre-processing
-        
+
     # Tokenize the text of each scholarship
     tokens = spacy_nlp(text)
 
@@ -43,7 +65,7 @@ def pre_processing(text):
         word = word.lemma_
         word = word.lower()
         word = word.strip()
-        if len(word)>=3 and word not in stop_words and word not in punctuations:
+        if len(word) >= 3 and word not in stop_words and word not in punctuations:
             try:
                 result_tokens.append(word)
             except:
@@ -61,7 +83,7 @@ def create_model(body_text):
     dictionary = corpora.Dictionary(body_text)
     corpus = [dictionary.doc2bow(tokens) for tokens in body_text]
 
-    important_words_model = TfidfModel(corpus, normalize = True)
+    important_words_model = TfidfModel(corpus, normalize=True)
 
     return important_words_model
 
@@ -74,29 +96,25 @@ def scrape_website():
 
     # The following functions are used to submit work to the ThreadPoolExecutor
     # TODO: Wait for a fix for BrightSparks scraper
-    def lohith_scraper_function():
-        return brightsparks()
-
-    def ayaan_scraper_function():
-        return mindef_scholarship()
-
-    def sairam_scraper_function():
-        return scrape()
 
     # Execute all 3 scrapers in parallel using ThreadPoolExecutor
     # and append the results to the text_tokenized list
-    with concurrent.futures.ThreadPoolExecutor() as executor:
+    with concurrent.futures.ProcessPoolExecutor() as executor:
         scrapers = [
             executor.submit(ayaan_scraper_function),
             executor.submit(sairam_scraper_function),
-            # executor.submit(lohith_scraper_function),
+            executor.submit(lohith_scraper_function),
         ]
         for data in concurrent.futures.as_completed(scrapers):
-            for e in range(len(data.result())):
-                try:
-                    text_tokenized.append([data.result()[e][0], pre_processing(data.result()[e][1])])
-                except:
-                    pass
+            try:
+                for e in range(len(data.result())):
+                    try:
+                        text_tokenized.append([data.result()[e][0], pre_processing(data.result()[e][1])])
+                    except:
+                        pass
+            except:
+                # The scraper failed; continue with other data first
+                pass
 
     # Casts the tokenized array of words in each scholarship, into a Pandas dataframe as this makes it easier to
     # create a tfidf model
@@ -116,7 +134,7 @@ def search_function(user_input):
             scholarships_results_text = pickle.load(f)
     except:
         scholarships_results_text = scrape_website()
-    
+
     # Create a model using the body text of all the scholarships
     corpus_model = create_model(scholarships_results_text["Body"])
 
@@ -125,7 +143,7 @@ def search_function(user_input):
     tfidf_corpus = corpora.MmCorpus('scholarships_model')
 
     scholarships_list = MatrixSimilarity(tfidf_corpus, num_features=corpus_model.num_nnz)
-    
+
     bowl_of_words_search = dictionary.doc2bow(pre_processing(user_input))
     search_model = corpus_model[bowl_of_words_search]
 
@@ -140,8 +158,9 @@ def search_function(user_input):
 
     for e, scholarship in enumerate(scholarships_index):
 
-        results.append({"Relevance": round((scholarship[1] * 100),2), "Link": scholarships_results_text["Link"][scholarship[0]]})
-        if e == (scholarships_list.num_best-1):
+        results.append(
+            {"Relevance": round((scholarship[1] * 100), 2), "Link": scholarships_results_text["Link"][scholarship[0]]})
+        if e == (scholarships_list.num_best - 1):
             break
 
     pd.set_option('display.max_colwidth', None)
