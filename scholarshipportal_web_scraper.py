@@ -49,15 +49,15 @@ def scrape_scholarship_details(url, selenium_lock: multiprocessing.Lock):
         # case we try scraping too fast
         Timer(sleep_time + (1.5 if (details == '') else 0), selenium_lock.release).start()
 
-        # print("Scraped: " + url)
+        print("Scraped: " + url)
 
         # Return the result
         return [url, details]
     except Exception as e:
         # For some reason some pages fail to load, so we just ignore them since it would not affect the overall result
         # too much
-        # print(f"Non-severe warning: Error parsing data from {url}: {e}."
-        #       f" Continuing anyway.")
+        print(f"Non-severe warning: Error parsing data from {url}: {e}."
+              f" Continuing anyway.")
         try:
             # Dispose all resources after exception
             web_driver.close()
@@ -78,7 +78,6 @@ def scrape_scholarship_urls(driver):
     all_scholarship_links = []
     while True:
         driver.delete_all_cookies()
-        driver.set_page_load_timeout(60)
         driver.get(f"https://www.scholarshipportal.com/scholarships/singapore?page={page_index}")
         sleep(7)
 
@@ -113,14 +112,18 @@ def scrape_all_scholarships_details(scholarship_links: list):
 
     # This part uses a Process pool to scrape all the scholarships in parallel, reducing
     # The time taken to scrape the websites
+    print("Starting...")
+
     try:
         with ProcessPoolExecutor(max_workers=5) as executor:
             for i in executor.map(scrape_scholarship_details, scholarship_links, itertools.repeat(lock)):
                 scholarships.append(i)
     except pickle.PicklingError:
         # This means that something somehow went wrong, but since it does not destroy any data we just continue
-        # print("Scraper has stopped scraping due to an error. Continuing with preexisting data.")
+        print("Scraper has stopped scraping due to an error. Continuing with preexisting data.")
         pass
+
+    print("Ended...")
 
     # Filter out all the scholarships that could not be scraped
     filtered_scholarships = list(filter((lambda x: x is not None and x[1] != ""), scholarships))
