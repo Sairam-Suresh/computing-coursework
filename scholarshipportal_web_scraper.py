@@ -13,10 +13,17 @@ from time import sleep, time
 import re
 from threading import Timer
 
+import logging
+
+# set up logger with basic config with a file as the output
+logging.basicConfig(filename="scholarshipportal_scraper.log",
+                    filemode="a",
+                    level=logging.INFO,
+                    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 
 # Function to scrape necessary data from the detail view of the scholarship
 # link.
-def scrape_scholarship_details(url, selenium_lock: multiprocessing.Lock):
+def scrape_scholarship_details(url, selenium_lock: multiprocessing.Lock, logger:logging.Logger):
     sleep_time = 4
 
     # Warm up the selenium instance
@@ -49,14 +56,14 @@ def scrape_scholarship_details(url, selenium_lock: multiprocessing.Lock):
         # case we try scraping too fast
         Timer(sleep_time + (1.5 if (details == '') else 0), selenium_lock.release).start()
 
-        print("Scraped: " + url)
+        logger.info("Scraped: " + url)
 
         # Return the result
         return [url, details]
     except Exception as e:
         # For some reason some pages fail to load, so we just ignore them since it would not affect the overall result
         # too much
-        print(f"Non-severe warning: Error parsing data from {url}: {e}."
+        logger.warning(f"Non-severe warning: Error parsing data from {url}: {e}."
               f" Continuing anyway.")
         try:
             # Dispose all resources after exception
@@ -70,7 +77,7 @@ def scrape_scholarship_details(url, selenium_lock: multiprocessing.Lock):
         return None
 
 
-def scrape_scholarship_urls(driver):
+def scrape_scholarship_urls(driver, logger:logging.Logger):
     # This portion scrapes all the scholarship links from the main page(s), by
     # using a while loop to go to the next page using the URL itself until we hit
     # a 404, which would mean that there are no more scholarships to scrape
@@ -94,16 +101,22 @@ def scrape_scholarship_urls(driver):
             # This only executes when the scraper detects that there are scholarships on the page in question
             for i in scholarship_links_on_page:
                 all_scholarship_links.append("https://www.scholarshipportal.com"+i.get("href"))
+            logger.info("Scraped page " + str(page_index))
             page_index += 1
+        elif page_index == 1:
+            # If the first page has no scholarships, it means we failed too fast; try again
+            logger.error("Failed on page 1. Retrying...")
+            continue
         else:
             # If no more scholarships are found, it means we probably hit a 404, which would mean that
             # There are no more scholarships left to scrape. Therefore break the loop
+            logger.info("No more scholarships found: Continuing to scrape details")
             break
 
     return all_scholarship_links
 
 
-def scrape_all_scholarships_details(scholarship_links: list):
+def scrape_all_scholarships_details(scholarship_links: list, logger:logging.Logger):
     scholarships = []
 
     # Create a Manager and obtain a lock for usage in the scrape_scholarship_details function
@@ -112,18 +125,18 @@ def scrape_all_scholarships_details(scholarship_links: list):
 
     # This part uses a Process pool to scrape all the scholarships in parallel, reducing
     # The time taken to scrape the websites
-    print("Starting...")
+    logger.info("Starting...")
 
     try:
         with ProcessPoolExecutor(max_workers=5) as executor:
-            for i in executor.map(scrape_scholarship_details, scholarship_links, itertools.repeat(lock)):
+            for i in executor.map(scrape_scholarship_details, scholarship_links, itertools.repeat(lock), itertools.repeat(logger)):
                 scholarships.append(i)
     except pickle.PicklingError:
         # This means that something somehow went wrong, but since it does not destroy any data we just continue
-        print("Scraper has stopped scraping due to an error. Continuing with preexisting data.")
+        logger.error("Scraper has stopped scraping due to an error. Continuing with preexisting data.")
         pass
 
-    print("Ended...")
+    logger.info("Ended...")
 
     # Filter out all the scholarships that could not be scraped
     filtered_scholarships = list(filter((lambda x: x is not None and x[1] != ""), scholarships))
@@ -131,6 +144,11 @@ def scrape_all_scholarships_details(scholarship_links: list):
 
 
 def scrape():
+    logger = logging.getLogger(__name__)
+    logger.addFilter(logging.Filter(__name__))
+
+    logger.info("Function Called")
+
     # This part of code can be shared between running the script as a standalone script or as a module
     is_main = __name__ == "__main__"
     start_time = time()
@@ -147,14 +165,14 @@ def scrape():
     driver.delete_all_cookies()
 
     # Scrape the scholarship links
-    scholarship_links = scrape_scholarship_urls(driver)
+    scholarship_links = scrape_scholarship_urls(driver, logger=logger)
 
     # Free resources
     driver.close()
     driver.quit()
 
     # This portion scrapes the details of all the scholarships by navigating to each URL
-    scholarships = scrape_all_scholarships_details(scholarship_links)
+    scholarships = scrape_all_scholarships_details(scholarship_links, logger=logger)
 
     if is_main:
         # If this script is being run as a standalone script, then we should give
