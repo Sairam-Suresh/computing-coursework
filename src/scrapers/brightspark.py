@@ -129,7 +129,7 @@ def brightsparks():
 
 
         # Wait for the code to load and opens new link
-        time.sleep(5)
+        time.sleep(7)
         soup = BeautifulSoup(drive.page_source, 'html.parser')
         save = drive.current_url
         print('Second Check')

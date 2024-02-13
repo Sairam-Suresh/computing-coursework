@@ -1,23 +1,19 @@
 # Done By: Ayaan (408)
 
 # import packages
-import pickle
-import os
 import pandas as pd
-import numpy as np
 import spacy
 import string
 from spacy.lang.en.stop_words import STOP_WORDS
 import concurrent.futures
 
-from brightspark import brightsparks
-from mindef_scholarships import *
+from src.scrapers.brightspark import brightsparks
+from src.scrapers.mindef_scholarships import *
 from gensim.models import TfidfModel  # We could use other models but this is better for tasks such as document
 # retrieval based on keyword matching.
 from gensim import corpora
 from gensim.similarities import MatrixSimilarity
-from operator import itemgetter
-from scholarshipportal_web_scraper import *
+from src.scrapers.scholarshipportal_web_scraper import *
 
 # We use pickle instead of json, as pickle is better for python
 scholarships_cache = "scholarships_cache.pkl"
