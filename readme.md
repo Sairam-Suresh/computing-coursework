@@ -4,13 +4,13 @@ Presented to you by Sairam from S401 and Ayaan and Lohith from S408
 ## Introduction
 ScholarFinder is a web application that helps students find a scholarship that they would like 
 to pursue without having to go through the hassle of searching for scholarships on different websites.
----
+
 ## Features
 **Search**: Users can search for scholarships based on their preferences, with a chat-like interface
 
 **Caching**: The application searches online for scholarships and downloads them to a database, so
 that future queries are much faster
----
+
 ## Installation
 1. Obtain a copy of this source code
 2. Install the required dependencies using this command:
@@ -24,7 +24,7 @@ streamlit run user_interface.py
 ```
 4. Open the link provided in the terminal to access the application
 5. Enjoy!
----
+
 ## Note!
 When you run the application and give it a query for the very first time it will take up to 
 **12 minutes** to complete, so please be patient! Subsequent answering times will be much faster
