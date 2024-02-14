@@ -22,18 +22,6 @@ global dictionary
 global scholarships_results_text
 
 
-def lohith_scraper_function():
-    return brightsparks()
-
-
-def ayaan_scraper_function():
-    return mindef_scholarship()
-
-
-def sairam_scraper_function():
-    return scrape()
-
-
 def pre_processing(text):
     spacy_nlp = spacy.load("en_core_web_sm")
 
@@ -86,9 +74,9 @@ def scrape_website():
     # and append the results to the text_tokenized list
     with concurrent.futures.ProcessPoolExecutor() as executor:
         scrapers = [
-            executor.submit(ayaan_scraper_function),
-            executor.submit(sairam_scraper_function),
-            executor.submit(lohith_scraper_function),
+            executor.submit(brightsparks),
+            executor.submit(scrape),
+            executor.submit(mindef_scholarship),
         ]
         for data in concurrent.futures.as_completed(scrapers):
             try:
