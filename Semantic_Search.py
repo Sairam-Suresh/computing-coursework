@@ -6,13 +6,14 @@ import spacy
 import string
 from spacy.lang.en.stop_words import STOP_WORDS
 import concurrent.futures
-from gensim.models import TfidfModel  # We could use other models but this is better for tasks such as document retrieval based on keyword matching.
+# We could use other models but this is better for tasks such as document retrieval based on keyword matching.
+from gensim.models import TfidfModel
 from gensim import corpora
 from gensim.similarities import MatrixSimilarity
 import pickle
 import streamlit as st
 
-#import the web scrapers
+# import the web scrapers
 from Scraping_Brightsparks import brightsparks
 from Scraping_Mindef_Scholarships import mindef_scholarships
 from Scraping_Scholarshipportal import scrape
@@ -25,7 +26,6 @@ global dictionary
 global scholarships_results_text
 
 
-
 def mindef_scraper_function():
     data = mindef_scholarships()
     return data
@@ -35,9 +35,11 @@ def scholarshipportal_scraper_function():
     data = scrape()
     return data
 
+
 def scholars4dev_scraper_function():
     data = Scholars4Dev()
     return data
+
 
 def brightsparks_scraper_function():
     try:
@@ -93,35 +95,29 @@ def scrape_website():
     # This function gathers all the scraped data from the websites
     text_tokenized = []
 
-
-
-    # The following code was added by Sairam from S401: Parallel scraping of websites using concurrent.futures.ThreadPoolExecutor
-    # The following functions are used to submit work to the ThreadPoolExecutor
-    # TODO: Wait for a fix for BrightSparks scraper
+    # The following code was added by Sairam from S401: Parallel scraping of websites using
+    # concurrent.futures.ProcessPoolExecutor The following functions are used to submit work to the ProcessPoolExecutor
 
     # Execute all 3 scrapers in parallel using ThreadPoolExecutor
     # and append the results to the text_tokenized list
     with concurrent.futures.ProcessPoolExecutor() as executor:
         scrapers = [
-            executor.submit(scholarshipportal_scraper_function()),
-            executor.submit(mindef_scraper_function()),
-            executor.submit(brightsparks_scraper_function()),
-            executor.submit(scholars4dev_scraper_function())
+            executor.submit(scholarshipportal_scraper_function),
+            executor.submit(mindef_scraper_function),
+            executor.submit(brightsparks_scraper_function),
+            executor.submit(scholars4dev_scraper_function)
         ]
         for data in concurrent.futures.as_completed(scrapers):
-            try:
-                for e in range(len(data.result())):
+            result = data.result()
+
+            if result is not None:
+                for e in range(len(result)):
                     st.write(data)
-                    try:
-                        text_tokenized.append([data.result()[e][0], pre_processing(data.result()[e][1])])
-                    except:
-                        pass
-            except:
-                # The scraper failed; continue with other data first
-                pass
-    #Sairam's code ends here
-
-
+                    text_tokenized.append([result[e][0], pre_processing(result[e][1])])
+            else:
+                # A scraper returned None, so we skip it
+                continue
+    # Sairam's code ends here
 
     # Casts the tokenized array of words in each scholarship, into a Pandas dataframe as this makes it easier to
     # create a tfidf model
