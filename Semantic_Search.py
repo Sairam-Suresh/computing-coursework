@@ -107,16 +107,17 @@ def scrape_website():
             executor.submit(brightsparks_scraper_function),
             executor.submit(scholars4dev_scraper_function)
         ]
+
         for data in concurrent.futures.as_completed(scrapers):
             result = data.result()
 
             if result is not None:
                 for e in range(len(result)):
-                    st.write(data)
                     text_tokenized.append([result[e][0], pre_processing(result[e][1])])
             else:
                 # A scraper returned None, so we skip it
                 continue
+
     # Sairam's code ends here
 
     # Casts the tokenized array of words in each scholarship, into a Pandas dataframe as this makes it easier to
@@ -136,14 +137,12 @@ def search_function(user_input):
     try:
         with open(scholarships_cache, "rb") as f:
             scholarships_results_text = pickle.load(f)
-            if scholarships_results_text != None:
+            if scholarships_results_text is not None:
                 st.write("Data loaded from cache successfully")
             else:
                 scholarships_results_text = scrape_website()
     except:
         scholarships_results_text = scrape_website()
-
-    st.write(scholarships_results_text)
 
     # Create a model using the body text of all the scholarships
     corpus_model = create_model(scholarships_results_text["Body"])
