@@ -20,7 +20,7 @@ spacy download en_core_web_sm
 ```
 3. Run the application using this command in the folder where the source code is located:
 ```bash
-streamlit run user_interface.py
+python3 -m streamlit run user_interface.py
 ```
 4. Open the link provided in the terminal to access the application
 5. Enjoy!
