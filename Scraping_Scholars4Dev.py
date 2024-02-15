@@ -1,6 +1,7 @@
 # This script was created in full by Ayaan Jain from S408
 
-# Website scraped by this programme: https://www.scholars4dev.com/10017/top-100-international-scholarships-international-students/
+# Website scraped by this program:
+# https://www.scholars4dev.com/10017/top-100-international-scholarships-international-students/
 
 # Imports
 from bs4 import BeautifulSoup
@@ -26,7 +27,8 @@ def Scholars4Dev():
         end = result.find("/>")
         scholarship_links.append(result[start:end-1])
 
-    # Scrape the individual pages of each scholarship (medicine and dentistry are not scraped as it is not supported in the website and therefore not considered)
+    # Scrape the individual pages of each scholarship (medicine and dentistry are not scraped as it is not supported
+    # in the website and therefore not considered)
     for scholarship in scholarship_links:
         scholarship_link = scholarship
         if scholarship_link:
@@ -37,6 +39,5 @@ def Scholars4Dev():
             scholarship_body = soup_scholarship.get_text()
 
             scholarship_results.append([scholarship_link, scholarship_body.replace("\n", "")])
-
 
     return scholarship_results
