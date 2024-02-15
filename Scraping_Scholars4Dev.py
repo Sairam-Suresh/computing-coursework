@@ -24,7 +24,7 @@ def Scholars4Dev():
     for result in results:
         result = str(result)
         start = result.find("https://www.scholars4dev.com/")
-        end = result.find("/>")
+        end = result.find('">')
         scholarship_links.append(result[start:end-1])
 
     # Scrape the individual pages of each scholarship (medicine and dentistry are not scraped as it is not supported
