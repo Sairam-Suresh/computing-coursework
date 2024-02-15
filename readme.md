@@ -13,16 +13,14 @@ that future queries are much faster
 
 ## Installation
 1. Obtain a copy of this source code
-2. Install the required dependencies using this command:
+2. Install the required dependencies:
 ```bash
 pip3 install selenium webdriver_manager pandas numpy spacy gensim scikit_learn streamlit beautifulsoup4 watchdog
 spacy download en_core_web_sm
 ```
 3. Run the application using this command in the folder where the source code is located:
 ```bash
-Python3 -m streamlit run User_Interface.py
-OR
-Python -m streamlit run User_Interface.py
+python3 -m streamlit run User_Interface.py
 ```
 4. Open the link provided in the terminal to access the application
 5. Enjoy!
