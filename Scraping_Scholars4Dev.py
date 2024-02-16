@@ -42,4 +42,3 @@ def Scholars4Dev():
 
     return scholarship_results
 
-print(Scholars4Dev())
