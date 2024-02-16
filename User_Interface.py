@@ -13,7 +13,7 @@ if internet_disclaimer:
     st.write("---")
 
     # Streamlit capture user input
-    user_input = st.chat_input("e.g. I am looking to study engineering in Yale")
+    user_input = st.chat_input("e.g. I want to study computer science, and I have good leadership skills")
 
     if user_input:
         # Progress bar that is synced
