@@ -155,7 +155,7 @@ def search_function(user_input):
     bowl_of_words_search = dictionary.doc2bow(pre_processing(user_input))
     search_model = corpus_model[bowl_of_words_search]
 
-    scholarships_list.num_best = 10
+    scholarships_list.num_best = 5
 
     scholarships_index = scholarships_list[bowl_of_words_search]
 
