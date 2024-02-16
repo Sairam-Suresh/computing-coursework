@@ -124,7 +124,6 @@ def scrape_website():
     # create a tfidf model
     scholarships_results_dataframe = pd.DataFrame(text_tokenized)
     scholarships_results_dataframe.rename(columns={0: "Link", 1: "Body"}, inplace=True)
-    st.write(scholarships_results_dataframe)
 
     # Save file to cache
     with open(scholarships_cache, "wb") as f:
