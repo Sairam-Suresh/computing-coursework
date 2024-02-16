@@ -22,8 +22,7 @@ logging.basicConfig(filename="scholarshipportal_scraper.log",
                     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 
 
-# Function to scrape necessary data from the detail view of the scholarship
-# link.
+# Function to scrape necessary data from a scholarship link.
 def scrape_scholarship_details(url, selenium_lock: multiprocessing.Lock, logger: logging.Logger):
     sleep_time = 4
 
@@ -40,6 +39,7 @@ def scrape_scholarship_details(url, selenium_lock: multiprocessing.Lock, logger:
 
     try:
         # Acquire the lock to prevent other processes from accessing the website at the same time
+        web_driver.set_page_load_timeout(10)
         selenium_lock.acquire()
         web_driver.get(url)
 
@@ -78,15 +78,24 @@ def scrape_scholarship_details(url, selenium_lock: multiprocessing.Lock, logger:
         return None
 
 
+# This function scrapes all the scholarship links it can find on the website
 def scrape_scholarship_urls(driver, logger: logging.Logger):
     # This portion scrapes all the scholarship links from the main page(s), by
     # using a while loop to go to the next page using the URL itself until we hit
     # a 404, which would mean that there are no more scholarships to scrape
     page_index = 1
     all_scholarship_links = []
+
+    driver.set_page_load_timeout(10)
+
     while True:
         driver.delete_all_cookies()
-        driver.get(f"https://www.scholarshipportal.com/scholarships/singapore?page={page_index}")
+        logger.info("About to scrape page " + str(page_index))
+        try:
+            driver.get(f"https://www.scholarshipportal.com/scholarships/singapore?page={page_index}")
+        except Exception as e:
+            logger.error(f"Error: Timed out attempting to scrape page ${page_index}. Trying again...", exc_info=e)
+            continue
         sleep(7)
 
         # Scroll to the bottom of the page to load all scholarships
@@ -117,6 +126,7 @@ def scrape_scholarship_urls(driver, logger: logging.Logger):
     return all_scholarship_links
 
 
+# This function takes a list of scholarship links and scrapes the details of each scholarship
 def scrape_all_scholarships_details(scholarship_links: list, logger: logging.Logger):
     scholarships = []
 
