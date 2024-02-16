@@ -18,7 +18,8 @@ that future queries are much faster
 pip3 install selenium webdriver_manager pandas numpy spacy gensim scikit_learn streamlit beautifulsoup4 watchdog
 spacy download en_core_web_sm
 ```
-3. Run the application using this command in the folder where the source code is located:
+3. Run the application using this command in the folder where the source code is located (If it does not run the
+4. first time, please close the terminal and run the command again):
 ```bash
 python3 -m streamlit run User_Interface.py
 ```
