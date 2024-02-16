@@ -98,7 +98,7 @@ def scrape_website():
     # The following code was added by Sairam from S401: Parallel scraping of websites using
     # concurrent.futures.ProcessPoolExecutor The following functions are used to submit work to the ProcessPoolExecutor
 
-    # Execute all 3 scrapers in parallel using ThreadPoolExecutor
+    # Execute all scrapers in parallel using ProcessPoolExecutor
     # and append the results to the text_tokenized list
     with concurrent.futures.ProcessPoolExecutor() as executor:
         scrapers = [
