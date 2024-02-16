@@ -29,8 +29,8 @@ def Scholars4Dev():
 
     # Scrape the individual pages of each scholarship (medicine and dentistry are not scraped as it is not supported
     # in the website and therefore not considered)
-    for scholarship in scholarship_links:
-        scholarship_link = scholarship
+    for i in range(4, len(scholarship_links)):
+        scholarship_link = scholarship_links[i]
         if scholarship_link:
             website_scholarship = requests.get(scholarship_link)
         
@@ -41,3 +41,5 @@ def Scholars4Dev():
             scholarship_results.append([scholarship_link, scholarship_body.replace("\n", "")])
 
     return scholarship_results
+
+print(Scholars4Dev())
